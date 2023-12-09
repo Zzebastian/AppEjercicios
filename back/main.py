@@ -1,13 +1,6 @@
-﻿import sqlite3
+﻿import sqlite3, os
 
-import os
-
-text = os.path.dirname(os.path.relpath(__file__))
-
-
-conexion = sqlite3.connect(f'{text}/ENTRENAMIENTO.sqlite')
-cursor = conexion.cursor()
-text = []
+text=[]
 text.append('''CREATE TABLE IF NOT EXISTS grupoMuscular (
             idGrupoM PRIMARY KEY,
             grupoM
@@ -36,12 +29,18 @@ text.append('''CREATE TABLE IF NOT EXISTS diario (
             FOREIGN KEY (idRutina1) REFERENCES rutinas (idRutina)
             )''')
 
-for elemento in text:
-    cursor.execute(elemento)
-    print('hecho')
+    
+class Inicializacion:
+    def __init__(self,text):
+        self.dir = os.path.dirname(os.path.relpath(__file__))
+        self.conexion = sqlite3.connect(f'{self.dir}/ENTRENAMIENTO.sqlite')
+        self.cursor = self.conexion.cursor()
+        self.text = text
+        for elemento in self.text:
+            self.cursor.execute(elemento)
+        self.conexion.commit()        
 
+    def cerrarConexion(self):
+        self.conexion.close()
 
-
-
-conexion.commit()
-conexion.close()
+inicio = Inicializacion(text)
