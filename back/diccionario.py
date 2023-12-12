@@ -9,24 +9,24 @@ for elemento in tablas:
 
 text.append('''CREATE TABLE grupoMuscular (
             idGrupoM INTEGER PRIMARY KEY AUTOINCREMENT,
-            grupoM
+            grupoM VARCHAR(20)
             )''')
 text.append('''CREATE TABLE ejercicios (
-            idEntrenamiento INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombreEntrenamiento,
-            idGrupoM,
+            idEjercicio INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombreEjercicio VARCHAR(20), 
+            idGrupoM INTEGER,
             FOREIGN KEY (idGrupoM) REFERENCES grupoMuscular (idGrupoM)
             )''')
 text.append('''CREATE TABLE rutinas (
             idRutina INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombreRutina
+            nombreRutina VARCHAR(20)
             )''')
 text.append('''CREATE TABLE plan (
-            dia,
-            idRutina,
-            idEjercicio,
-            repeticiones,
-            peso,
+            dia INTEGER,
+            idRutina INTEGER,
+            idEjercicio INTEGER,
+            repeticiones INTEGER,
+            peso INTEGER,
             PRiMARY KEY (dia, idRutina, idEjercicio)
             )''')
 
@@ -36,7 +36,7 @@ for elemento in grupos:
     text.append(
         f'''INSERT INTO grupoMuscular (grupoM) VALUES ("{elemento}")''')
 
-entrenamientos = (('Press Banca Plano', 1),
+ejercicios = (('Press Banca Plano', 1),
                   ('Press Banca Inclinado', 1),
                   ('Aperturas Planas', 1),
                   ('Scot con barra W', 4),
@@ -74,9 +74,9 @@ entrenamientos = (('Press Banca Plano', 1),
                   ('Encogimientos oblicuos', 7),
                   ('Elevaciones piernas', 7),
                   )
-for elemento in entrenamientos:
+for elemento in ejercicios:
     text.append(
-        f'''INSERT INTO ejercicios (nombreEntrenamiento, idGrupoM) VALUES {elemento}''')
+        f'''INSERT INTO ejercicios (nombreEjercicio, idGrupoM) VALUES {elemento}''')
 
 rutinas = (('Pecho-Biceps'),
            ('Piernas-Hombros'),
@@ -118,3 +118,18 @@ plan = ((1, 1, 1, '12-10-8-6', 20),
 for elemento in plan:
     text.append(
         f'''INSERT INTO plan (dia, idRutina, idEjercicio, repeticiones, peso) VALUES {elemento}''')
+
+import os
+nombre = "Entrenamiento"
+file = os.path.dirname(os.path.relpath(__file__))+"/"+nombre+".sql"
+if not os.path.exists(file):
+    inicializacion = f"""DROP DATABASE IF EXISTS `{nombre}`;
+    CREATE DATABASE {nombre};
+    USE {nombre};"""
+    with open (file, "w") as archivo:
+        archivo.write(f"{inicializacion}\n")
+        for elemento in text:
+            elemento = elemento.replace("AUTOINCREMENT","AUTO_INCREMENT")
+            archivo.write(f"{elemento};\n")
+        
+        archivo.close()
